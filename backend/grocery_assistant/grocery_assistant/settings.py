@@ -1,17 +1,16 @@
 import os
+
 import dotenv
 
 dotenv.load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-SECRET_KEY = '7n+p%k^qq+zux^wman3qe1=u3-*flsgj90uth_y2&i92t(n5r6'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,7 +53,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'grocery_assistant.wsgi.application'
-
 
 DATABASES = {
     'default': {
