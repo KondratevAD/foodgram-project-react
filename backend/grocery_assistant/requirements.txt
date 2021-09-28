@@ -1,3 +1,8 @@
 django
 python-dotenv
 psycopg2
+flake8
+djoser
+djangorestframework_simplejwt
+django-colorfield
+Pillow
