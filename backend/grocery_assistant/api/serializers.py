@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from recipes.models import Tag
 from rest_framework import serializers
 from users.models import User
 
@@ -20,3 +21,14 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
         )
         model = User
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'color',
+            'slug'
+        )
+        model = Tag
