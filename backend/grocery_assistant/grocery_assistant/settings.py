@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 
 import dotenv
 
@@ -22,10 +21,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
     'api',
     'recipes',
-    'users',
     'rest_framework',
+    'rest_framework.authtoken',
     'djoser',
     'colorfield',
 ]
@@ -91,13 +91,36 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.'
+                                'PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+AUTH_USER_MODEL = 'users.User'
+
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+# }
+
+DJOSER = {
+    # 'USER_ID_FIELD': '#/password/reset/confirm/{uid}/{token}',
+    # 'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    # 'SEND_ACTIVATION_EMAIL': True,
+    # 'SERIALIZERS': {
+    #     'user': 'api.serializers.UserSerializer',
+    # },
+    # 'USER_ID_FIELD': 'email',
+    'LOGIN_FIELD': 'email'
 }
+
+# AUTHENTICATION_BACKENDS = (
+#     "django.contrib.auth.backends.ModelBackend",
+#     # "allauth.account.auth_backends.AuthenticationBackend"
+# )
+
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 

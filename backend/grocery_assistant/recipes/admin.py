@@ -1,6 +1,19 @@
 from django.contrib import admin
+from users.models import User
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'username',
+        'email',
+        'role'
+    )
+    search_fields = ('name',)
+    empty_value_display = '-пусто-'
 
 
 @admin.register(Recipe)

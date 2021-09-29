@@ -3,6 +3,8 @@ python-dotenv
 psycopg2
 flake8
 djoser
-djangorestframework_simplejwt
+djangorestframework
+djangorestframework_simplejwt # возможно не нужно
 django-colorfield
 Pillow
+django-allauth
