@@ -4,7 +4,6 @@ psycopg2
 flake8
 djoser
 djangorestframework
-djangorestframework_simplejwt # возможно не нужно
 django-colorfield
 Pillow
 django-allauth

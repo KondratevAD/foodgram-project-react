@@ -31,12 +31,12 @@ class Recipe(models.Model):
         verbose_name='Ингредиенты',
         help_text='Ингредиенты'
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         'Tag',
         verbose_name='Тег',
-        help_text='Тег'
+        help_text='Тег',
     )
-    coking_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления',
         help_text='Время приготовления в минутах',
         validators=[MinValueValidator(1)]
@@ -122,13 +122,17 @@ class Favorite(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        # related_name='favorites'
+        related_name='favorites'
     )
     recipe = models.ForeignKey(
         'Recipe',
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
-        # related_name='favorite_recipes'
+        related_name='favorite'
+    )
+    shopping_cart = models.BooleanField(
+        verbose_name='Корзина покупок',
+        default=False
     )
 
     class Meta:

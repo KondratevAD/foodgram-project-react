@@ -3,9 +3,4 @@
 #
 #
 # def index(request):
-#     recipes = Recipe.objects.all()
-#     return render(
-#         request,
-#         'src/index.js',
-#         {'recipes': recipes, }
-#     )
+#     return render(request, 'index.html')
