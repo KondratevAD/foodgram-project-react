@@ -134,6 +134,10 @@ class Favorite(models.Model):
         verbose_name='Корзина покупок',
         default=False
     )
+    favourite = models.BooleanField(
+        verbose_name='Избранное',
+        default=False
+    )
 
     class Meta:
         verbose_name = 'Избранный рецепт'

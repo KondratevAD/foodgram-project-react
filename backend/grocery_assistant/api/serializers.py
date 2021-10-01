@@ -199,3 +199,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         if self.context['request'].user.is_authenticated and favorite:
             return favorite[0].shopping_cart
         return False
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time'
+        )
+        model = Recipe

@@ -1,11 +1,11 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from djoser import views as djoser_views
 from rest_framework.routers import DefaultRouter
 
 from . import views
 
 router_v1 = DefaultRouter()
-router_v1.register(r'users', views.UserViewSet, basename='UserView')
+router_v1.register('users', views.UserViewSet, basename='UserView')
 router_v1.register('tags', views.TagViewSet, basename='TagView')
 router_v1.register(
     'ingredients',
@@ -22,4 +22,9 @@ urlpatterns = [
     ),
     path('v1/', include(router_v1.urls)),
     path('v1/auth/', include('djoser.urls.authtoken')),
+    re_path(
+        r'recipes/(?P<id>[0-9]+)/shopping_cart',
+        views.shopping_cart,
+        name='ShoppingView'
+    )
 ]
