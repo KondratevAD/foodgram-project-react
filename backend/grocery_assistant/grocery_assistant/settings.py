@@ -154,7 +154,7 @@ ROLES_PERMISSIONS = {
         'anon': (None,),
     },
     'Recipe': {
-        'user': ('GET', 'POST'),
+        'user': ('GET', 'POST', 'PUT', 'DELETE'),
         'moderator': ('GET', 'PATCH', 'DELETE', 'POST', 'PUT'),
         'anon': ('GET',),
     },

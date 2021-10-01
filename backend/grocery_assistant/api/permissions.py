@@ -1,13 +1,12 @@
-from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class AnonRegister(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.method == 'POST' or request.user.is_authenticated
+class IsAuthor(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.method in SAFE_METHODS or obj.author == request.user
 
 
-class PermissonForRole(permissions.BasePermission):
-
+class PermissonForRole(BasePermission):
     def __init__(self, roles_permissions) -> None:
         super().__init__()
         self.roles_permissions = roles_permissions

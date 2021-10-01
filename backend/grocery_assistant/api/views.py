@@ -4,12 +4,13 @@ from grocery_assistant.settings import ROLES_PERMISSIONS
 from recipes.models import Ingredient, Recipe, Tag
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import User
 
 from .paginations import StandardResultsSetPagination
-from .permissions import PermissonForRole
+from .permissions import IsAuthor, PermissonForRole
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           TagSerializer, UserSerializer)
 
@@ -66,5 +67,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (
         partial(PermissonForRole, ROLES_PERMISSIONS.get('Recipe')),
+        IsAuthor,
     )
     pagination_class = StandardResultsSetPagination
+
+    def perform_create(self, serializer):
+        if 'tags' not in self.request.data:
+            raise ParseError(detail={'tags': ['This field is required.']})
+        tag_id = self.request.data['tags']
+        if type(tag_id) is not list:
+            raise ParseError(detail={'tags': ['This field should be a list.']})
+        author = self.request.user
+        serializer.save(author=author, tags=tag_id)
+
+    def perform_update(self, serializer):
+        if 'tags' not in self.request.data:
+            raise ParseError(detail={'tags': ['This field is required.']})
+        tag_id = self.request.data['tags']
+        if type(tag_id) is not list:
+            raise ParseError(detail={'tags': ['This field should be a list.']})
+        serializer.save(tags=tag_id)
+
+    def perform_destroy(self, instance):
+        instance.ingredients.all().delete()
+        instance.delete()

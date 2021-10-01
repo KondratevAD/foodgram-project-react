@@ -1,7 +1,37 @@
+import base64
+import imghdr
+import uuid
+
+import six
 from django.contrib.auth.hashers import make_password
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
+from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import serializers
+from rest_framework.exceptions import ParseError
 from users.models import User
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, six.string_types):
+            if 'data:' in data and ';base64,' in data:
+                header, data = data.split(';base64,')
+            try:
+                decoded_file = base64.b64decode(data)
+            except TypeError:
+                self.fail('invalid_image')
+            file_name = str(uuid.uuid4())[:12]
+            file_extension = self.get_file_extension(file_name, decoded_file)
+            complete_file_name = '%s.%s' % (file_name, file_extension, )
+            data = ContentFile(decoded_file, name=complete_file_name)
+        return super(Base64ImageField, self).to_internal_value(data)
+
+    def get_file_extension(self, file_name, decoded_file):
+        extension = imghdr.what(file_name, decoded_file)
+        if extension == 'jpeg':
+            return 'jpg'
+        return extension
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,6 +70,7 @@ class TagSerializer(serializers.ModelSerializer):
             'slug'
         )
         model = Tag
+        # read_only_fields = ['name', 'color', 'slug']
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -65,6 +96,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             'amount'
         )
         model = RecipeIngredient
+        # read_only_fields = ['name' , 'measurement_unit' ,]
 
     def get_id(self, obj):
         return obj.ingredient.id
@@ -77,12 +109,15 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
+    tags = TagSerializer(many=True, read_only=True)
     ingredients = RecipeIngredientSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
+    )
+    image = Base64ImageField(
+        max_length=None, use_url=True,
     )
 
     class Meta:
@@ -100,14 +135,67 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
+    def create(self, validated_data):
+        recipe = Recipe.objects.create(
+            name=validated_data['name'],
+            author=validated_data['author'],
+            text=validated_data['text'],
+            image=validated_data['image'],
+            cooking_time=validated_data['cooking_time']
+        )
+        for tag_id in validated_data['tags']:
+            if type(tag_id) is not int:
+                recipe.delete()
+                raise ParseError(
+                    detail={'tags': ['A valid integer is required.']}
+                )
+            tag = get_object_or_404(Tag, id=tag_id)
+            recipe.tags.add(tag)
+        for ingredient in self.initial_data['ingredients']:
+            ingredient_mod = get_object_or_404(Ingredient, id=ingredient['id'])
+            recipe_ingredient = RecipeIngredient.objects.create(
+                ingredient=ingredient_mod,
+                amount=ingredient['amount']
+            )
+            recipe.ingredients.add(recipe_ingredient)
+        return recipe
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data['name']
+        instance.text = validated_data['text']
+        instance.image = validated_data['image']
+        instance.cooking_time = validated_data['cooking_time']
+        for tag_id in validated_data['tags']:
+            if type(tag_id) is not int:
+                raise ParseError(
+                    detail={'tags': ['A valid integer is required.']}
+                )
+            tag = get_object_or_404(Tag, id=tag_id)
+            instance.tags.add(tag)
+        instance.ingredients.all().delete()
+        for ingredient in self.initial_data['ingredients']:
+            ingredient_mod = get_object_or_404(Ingredient, id=ingredient['id'])
+            recipe_ingredient = RecipeIngredient.objects.create(
+                ingredient=ingredient_mod,
+                amount=ingredient['amount']
+            )
+            instance.ingredients.add(recipe_ingredient)
+        instance.save()
+        return instance
+
     def get_is_favorited(self, obj):
-        return obj.favorite.values('user_id').filter(
-            user_id=self.context['request'].user.id
-        ).exists()
+        if self.context['request'].user.is_authenticated:
+            return Favorite.objects.filter(
+                recipe_id=obj.id,
+                user_id=self.context['request'].user.id
+            ).exists()
+        return False
 
     def get_is_in_shopping_cart(self, obj):
-        if self.context['request'].user.is_authenticated:
-            return obj.favorite.get(
+        favorite = Favorite.objects.filter(
+                recipe_id=obj.id,
                 user_id=self.context['request'].user.id
-            ).shopping_cart
+            )
+        if self.context['request'].user.is_authenticated and favorite:
+            return favorite[0].shopping_cart
         return False
