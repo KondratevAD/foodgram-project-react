@@ -19,7 +19,7 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        # related_name='recipes'
+        related_name='recipes'
     )
     image = models.ImageField(
         upload_to='recipes/',
@@ -112,6 +112,9 @@ class RecipeIngredient(models.Model):
         validators=[MinValueValidator(1)]
     )
 
+    def __str__(self) -> str:
+        return self.ingredient.name
+
     class Meta:
         verbose_name = 'Ингредиент рецепта'
         verbose_name_plural = 'Ингредиенты рецепта'
@@ -134,7 +137,7 @@ class Favorite(models.Model):
         verbose_name='Корзина покупок',
         default=False
     )
-    favourite = models.BooleanField(
+    favorite = models.BooleanField(
         verbose_name='Избранное',
         default=False
     )

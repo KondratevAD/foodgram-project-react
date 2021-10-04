@@ -6,7 +6,8 @@ import six
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
-from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Tag
+from recipes.models import (Favorite, Follow, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
 from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 from users.models import User
@@ -210,3 +211,36 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
         model = Recipe
+
+
+class FolllowSerializer(serializers.ModelSerializer):
+    recipes = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
+        model = User
+
+    def get_is_subscribed(self, obj):
+        return Follow.objects.filter(
+            author_id=obj.id,
+            user_id=self.context.user.id
+        ).exists()
+
+    def get_recipes(self, obj):
+        data = Recipe.objects.filter(author_id=obj.id).all()
+        serializers = FavoriteSerializer(data, many=True)
+        return serializers.data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author_id=obj.id).count()

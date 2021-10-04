@@ -7,3 +7,4 @@ djangorestframework
 django-colorfield
 Pillow
 django-allauth
+reportlab

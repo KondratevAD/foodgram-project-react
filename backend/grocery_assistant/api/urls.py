@@ -16,15 +16,30 @@ router_v1.register('recipes', views.RecipeViewSet, basename='RecipeView')
 
 urlpatterns = [
     path(
-        'v1/users/set_password/',
+        'users/set_password/',
         djoser_views.UserViewSet.as_view({'post': 'set_password'}),
         name='userSetPassword'
     ),
-    path('v1/', include(router_v1.urls)),
-    path('v1/auth/', include('djoser.urls.authtoken')),
+    # path(
+    #     'users/subscriptions/',
+    #     views.subscriptions,
+    #     name='SubscriptionsView'
+    # ),
+    path('', include(router_v1.urls)),
+    path('auth/', include('djoser.urls.authtoken')),
     re_path(
         r'recipes/(?P<id>[0-9]+)/shopping_cart',
         views.shopping_cart,
         name='ShoppingView'
+    ),
+    re_path(
+        r'recipes/(?P<id>[0-9]+)/favorite',
+        views.favorite,
+        name='FavoriteView'
+    ),
+    re_path(
+        r'users/(?P<id>[0-9]+)/subscribe',
+        views.follow,
+        name='FollowView'
     )
 ]

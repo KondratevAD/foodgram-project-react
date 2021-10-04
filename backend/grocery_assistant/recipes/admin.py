@@ -11,7 +11,7 @@ class FavoriteAdmin(admin.ModelAdmin):
         'user',
         'recipe',
         'shopping_cart',
-        'favourite'
+        'favorite'
     )
     empty_value_display = '-пусто-'
 
