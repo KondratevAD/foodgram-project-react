@@ -186,10 +186,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         if self.context['request'].user.is_authenticated:
-            return Favorite.objects.filter(
+            favor = Favorite.objects.filter(
                 recipe_id=obj.id,
                 user_id=self.context['request'].user.id
-            ).exists()
+            ).first()
+            print(favor)
+            if favor:
+                return favor.favorite
+            return False
         return False
 
     def get_is_in_shopping_cart(self, obj):
@@ -238,7 +242,11 @@ class FolllowSerializer(serializers.ModelSerializer):
         ).exists()
 
     def get_recipes(self, obj):
-        data = Recipe.objects.filter(author_id=obj.id).all()
+        if 'recipes_limit' in self.context.GET:
+            count = int(self.context.GET['recipes_limit'])
+            data = Recipe.objects.filter(author_id=obj.id).all()[:count]
+        else:
+            data = Recipe.objects.filter(author_id=obj.id).all()
         serializers = FavoriteSerializer(data, many=True)
         return serializers.data
 

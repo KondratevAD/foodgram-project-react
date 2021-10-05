@@ -95,7 +95,7 @@ class Ingredient(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('id',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 

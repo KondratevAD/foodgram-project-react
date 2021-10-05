@@ -8,3 +8,4 @@ django-colorfield
 Pillow
 django-allauth
 reportlab
+django-filter

@@ -16,6 +16,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import User
 
+from .filters import IngredientFilter, RecipeFilter
 from .paginations import StandardResultsSetPagination
 from .permissions import IsAuthor, PermissonForRole
 from .serializers import (FavoriteSerializer, FolllowSerializer,
@@ -57,7 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=['GET'],
-        detail=False,  # нужна пагинация
+        detail=False,
         permission_classes=[
             partial(PermissonForRole, ROLES_PERMISSIONS.get('Users_me'))
         ],
@@ -69,10 +70,13 @@ class UserViewSet(viewsets.ModelViewSet):
                 user_id=request.user.id
         ).select_related('author'):
             author_list.add(_.author)
-        data = User.objects.filter(
-            id__in=[i.id for i in author_list]).all()
-        serializer = FolllowSerializer(data, context=request, many=True)
-        return Response(serializer.data)
+        data = self.filter_queryset(User.objects.filter(
+            id__in=[i.id for i in author_list]).all())
+        page = self.paginate_queryset(data)
+        serializer = FolllowSerializer(page, context=request, many=True)
+        if page is not None:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data, {'filter': filter})
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -85,6 +89,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny, ]
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -95,6 +100,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         IsAuthor,
     )
     pagination_class = StandardResultsSetPagination
+    filterset_class = RecipeFilter
 
     @action(
         methods=['GET'],
@@ -129,16 +135,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         p.line(0, 778, 1000, 778)
         x1 = 20
         y1 = 750
-        data = dict(sorted(data.items(), key=lambda item: item[1]))
+        data = dict(sorted(data.items(), key=lambda item: int(item[0])))
         for k, v in data.items():
             ingredient = Ingredient.objects.get(id=k)
-
             p.setFont('FreeSans', 15, leading=None)
             p.drawString(
                 x1,
                 y1-12,
-                f'{ingredient.name} ({ingredient.measurement_unit}) - {v}'
-            )
+                f'{ingredient.name} ({ingredient.measurement_unit}) - {v}')
             y1 = y1 - 30
         p.setTitle('SetTitle')
         p.showPage()
