@@ -13,7 +13,6 @@ class FavoriteAdmin(admin.ModelAdmin):
         'shopping_cart',
         'favorite'
     )
-    empty_value_display = '-пусто-'
 
 
 @admin.register(User)
@@ -24,8 +23,7 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'role'
     )
-    search_fields = ('name',)
-    empty_value_display = '-пусто-'
+    list_filter = ('email', 'username')
 
 
 @admin.register(Follow)
@@ -35,7 +33,6 @@ class FollowAdmin(admin.ModelAdmin):
         'user',
         'author'
     )
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Recipe)
@@ -46,13 +43,15 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
         'text',
         'author',
-        'image',
         'cooking_time',
-        'pub_date'
+        'in_favorite'
     )
     search_fields = ('name',)
-    list_filter = ('pub_date',)
-    empty_value_display = '-пусто-'
+    list_filter = ('author', 'name', 'tags')
+
+    @admin.display
+    def in_favorite(self, obj):
+        return obj.favorite.filter(favorite=True).count()
 
 
 @admin.register(Tag)
@@ -66,20 +65,16 @@ class TagAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('slug',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     """Админка ингредиентов"""
     list_display = (
-        'pk',
         'name',
         'measurement_unit'
     )
-    search_fields = ('name',)
-    list_filter = ('measurement_unit',)
-    empty_value_display = '-пусто-'
+    list_filter = ('name',)
 
 
 @admin.register(RecipeIngredient)
@@ -91,5 +86,4 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
         'amount'
     )
     search_fields = ('ingredient',)
-    list_filter = ('amount',)
-    empty_value_display = '-пусто-'
+    list_filter = ('ingredient',)

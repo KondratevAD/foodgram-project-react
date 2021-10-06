@@ -95,7 +95,7 @@ class Ingredient(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('id',)
+        ordering = ('id', )
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
@@ -143,8 +143,8 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Избранный рецепт'
-        verbose_name_plural = 'Избранные рецепты'
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
 
 
 class Follow(models.Model):

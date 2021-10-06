@@ -1,10 +1,5 @@
-import base64
-import imghdr
-import uuid
 
-import six
 from django.contrib.auth.hashers import make_password
-from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag)
@@ -12,27 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 from users.models import User
 
-
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, six.string_types):
-            if 'data:' in data and ';base64,' in data:
-                header, data = data.split(';base64,')
-            try:
-                decoded_file = base64.b64decode(data)
-            except TypeError:
-                self.fail('invalid_image')
-            file_name = str(uuid.uuid4())[:12]
-            file_extension = self.get_file_extension(file_name, decoded_file)
-            complete_file_name = '%s.%s' % (file_name, file_extension, )
-            data = ContentFile(decoded_file, name=complete_file_name)
-        return super(Base64ImageField, self).to_internal_value(data)
-
-    def get_file_extension(self, file_name, decoded_file):
-        extension = imghdr.what(file_name, decoded_file)
-        if extension == 'jpeg':
-            return 'jpg'
-        return extension
+from .Image_base64 import Base64ImageField
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -50,7 +25,6 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
         )
         model = User
-        # read_only_fields = ['email', 'username', 'first_name', 'last_name' ]
 
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
@@ -71,7 +45,6 @@ class TagSerializer(serializers.ModelSerializer):
             'slug'
         )
         model = Tag
-        # read_only_fields = ['name', 'color', 'slug']
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -97,7 +70,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             'amount'
         )
         model = RecipeIngredient
-        # read_only_fields = ['name' , 'measurement_unit' ,]
 
     def get_id(self, obj):
         return obj.ingredient.id
@@ -190,7 +162,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 recipe_id=obj.id,
                 user_id=self.context['request'].user.id
             ).first()
-            print(favor)
             if favor:
                 return favor.favorite
             return False

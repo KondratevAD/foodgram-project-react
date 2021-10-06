@@ -1,14 +1,8 @@
-import io
 from functools import partial
 
-from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from grocery_assistant.settings import ROLES_PERMISSIONS
 from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ParseError
@@ -16,6 +10,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import User
 
+from .filePDF import get_pdf
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import StandardResultsSetPagination
 from .permissions import IsAuthor, PermissonForRole
@@ -107,48 +102,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=[
             partial(PermissonForRole, ROLES_PERMISSIONS.get('Recipe'))
-        ],  # только get
+        ],
         url_path='download_shopping_cart'
     )
     def get_shopping_cart(self, request):
         data = dict()
-        favorit = Favorite.objects.filter(
-            user_id=request.user.id,
-            shopping_cart=True
-        ).all()
-        for _ in favorit:
-            recipe = Recipe.objects.filter(id=_.recipe.id).all()
-            for k in recipe:
-                a = k.ingredients.all()
-                for i in a:
-                    if f'{i.ingredient.id}' in data:
-                        data[f'{i.ingredient.id}'] += i.amount
-                    else:
-                        data[f'{i.ingredient.id}'] = i.amount
-        buffer = io.BytesIO()
-        p = canvas.Canvas(buffer, pagesize=A4)
-        pdfmetrics.registerFont(TTFont('FreeSans', 'FreeSans.ttf'))
-        p.setFont('FreeSans', 15, leading=None)
-        p.setFillColorRGB(0.29296875, 0.453125, 0.609375)
-        p.drawString(260, 800, 'Список покупок')
-        p.line(0, 780, 1000, 780)
-        p.line(0, 778, 1000, 778)
-        x1 = 20
-        y1 = 750
-        data = dict(sorted(data.items(), key=lambda item: int(item[0])))
-        for k, v in data.items():
-            ingredient = Ingredient.objects.get(id=k)
-            p.setFont('FreeSans', 15, leading=None)
-            p.drawString(
-                x1,
-                y1-12,
-                f'{ingredient.name} ({ingredient.measurement_unit}) - {v}')
-            y1 = y1 - 30
-        p.setTitle('SetTitle')
-        p.showPage()
-        p.save()
-        buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+        recipes = Recipe.objects.filter(
+            favorite__shopping_cart=True
+        ).prefetch_related('ingredients')
+        for recipe in recipes:
+            ingredients = [
+                ingredients for ingredients in recipe.ingredients.all()
+            ]
+            for ingredient in ingredients:
+                if f'{ingredient.ingredient.id}' in data:
+                    data[
+                        f'{ingredient.ingredient.id}'
+                    ]['amount'] += ingredient.amount
+                else:
+                    data.update(
+                        {
+                            f'{ingredient.ingredient.id}': {
+                                'name': ingredient.ingredient.name,
+                                'measurement_unit':
+                                    ingredient.ingredient.measurement_unit,
+                                'amount': ingredient.amount
+                            }
+                        }
+                    )
+        data = dict(sorted(data.items(), key=lambda item: item[1]['name']))
+        return get_pdf(data)
 
     def perform_create(self, serializer):
         if 'tags' not in self.request.data:
