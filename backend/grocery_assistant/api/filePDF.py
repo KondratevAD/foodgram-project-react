@@ -13,6 +13,11 @@ TITLE = 'Список покупок'
 
 
 def get_pdf(data):
+    """Формирует файл PDF.
+
+    Ключевые аргументы:
+    data -- словарь с данными.
+    """
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     rl_config.TTFSearchPath.append(str(settings.BASE_DIR) + '/api/fonts')
@@ -27,10 +32,10 @@ def get_pdf(data):
     o = 1
     for v in data.values():
         p.setFont('FreeSans', 15, leading=None)
-        p.rect(x1-20, y1-12, 13, 13, fill=0)
+        p.rect(x1 - 20, y1 - 12, 13, 13, fill=0)
         p.drawString(
             x1,
-            y1-12,
+            y1 - 12,
             f"{o}. {v['name']} ({v['measurement_unit']}) - {v['amount']}"
         )
         y1 = y1 - 30

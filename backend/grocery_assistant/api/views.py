@@ -176,7 +176,7 @@ def shopping_cart(request, id):
         if favor.shopping_cart is True:
             raise ParseError(
                 detail={
-                    'tags': ['The recipe is already on your shopping list.']
+                    'error': ['The recipe is already on your shopping list.']
                 }
             )
         else:
@@ -189,7 +189,7 @@ def shopping_cart(request, id):
         if favor.shopping_cart is False:
             raise ParseError(
                 detail={
-                    'tags': ['The recipe is not on your shopping list.']
+                    'error': ['The recipe is not on your shopping list.']
                 }
             )
         else:
@@ -209,7 +209,7 @@ def favorite(request, id):
         if favor.favorite is True:
             raise ParseError(
                 detail={
-                    'tags': [
+                    'error': [
                         'The recipe is already on your shopping list.']
                 }
             )
@@ -223,7 +223,7 @@ def favorite(request, id):
         if favor.favorite is False:
             raise ParseError(
                 detail={
-                    'tags': ['The recipe is not on your favorite list.']
+                    'error': ['The recipe is not on your favorite list.']
                 }
             )
         else:
@@ -267,6 +267,6 @@ def follow(request, id):
         else:
             raise ParseError(
                 detail={
-                    'tags': ['You are not subscribed to this user.']
+                    'error': ['You are not subscribed to this user.']
                 }
             )
