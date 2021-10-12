@@ -6,7 +6,6 @@ from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ParseError
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import User
 
@@ -43,7 +42,7 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=['GET'],
         detail=False,
         permission_classes=[
-            partial(PermissonForRole, ROLES_PERMISSIONS.get('Users_me'))
+            partial(PermissonForRole, ROLES_PERMISSIONS.get('Users_id'))
         ],
         url_path=r'(?P<user_id>[0-9]+)',
     )
@@ -77,13 +76,17 @@ class UserViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = (
+        partial(PermissonForRole, ROLES_PERMISSIONS.get('Tags')),
+    )
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = [AllowAny, ]
+    permission_classes = (
+        partial(PermissonForRole, ROLES_PERMISSIONS.get('Ingredients')),
+    )
     filterset_class = IngredientFilter
 
 
@@ -101,15 +104,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=['GET'],
         detail=False,
         permission_classes=[
-            partial(PermissonForRole, ROLES_PERMISSIONS.get('Recipe'))
+            partial(PermissonForRole, ROLES_PERMISSIONS.get('Shopping_cart'))
         ],
         url_path='download_shopping_cart'
     )
     def get_shopping_cart(self, request):
         data = dict()
         recipes = Recipe.objects.filter(
+            favorite__user=self.request.user,
             favorite__shopping_cart=True
         ).prefetch_related('ingredients')
+        if not recipes:
+            raise ParseError(
+                detail={
+                    'error': ['Your shopping list is empty.']
+                }
+            )
         for recipe in recipes:
             ingredients = [
                 ingredients for ingredients in recipe.ingredients.all()

@@ -37,6 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+
     class Meta:
         fields = (
             'id',
@@ -45,6 +46,7 @@ class TagSerializer(serializers.ModelSerializer):
             'slug'
         )
         model = Tag
+        extra_kwargs = {'color': {'required': True}}
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -86,9 +88,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
+    author = UserSerializer(read_only=True)
     image = Base64ImageField(
         max_length=None, use_url=True,
     )
@@ -134,16 +134,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        instance.name = validated_data['name']
-        instance.text = validated_data['text']
-        instance.image = validated_data['image']
-        instance.cooking_time = validated_data['cooking_time']
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.image = validated_data.get('image', instance.image)
+        instance.cooking_time = validated_data.get(
+            'cooking_time',
+            instance.cooking_time
+        )
         for tag_id in validated_data['tags']:
             if type(tag_id) is not int:
                 raise ParseError(
                     detail={'tags': ['A valid integer is required.']}
                 )
             tag = get_object_or_404(Tag, id=tag_id)
+            instance.tags.clear()
             instance.tags.add(tag)
         instance.ingredients.all().delete()
         for ingredient in self.initial_data['ingredients']:

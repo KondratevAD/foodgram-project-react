@@ -6,34 +6,33 @@ dotenv.load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# TEMPLATE_DIRS = ('/home/alex/Dev/Diplom/foodgram-project-react/frontend/',)
-
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'DEFAULT')
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
+    'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
     'users',
     'api',
     'recipes',
-    'rest_framework',
-    'rest_framework.authtoken',
     'djoser',
-    'colorfield',
     'django_filters',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -46,7 +45,7 @@ ROOT_URLCONF = 'grocery_assistant.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # '/home/alex/Dev/Diplom/foodgram-project-react/frontend/'
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,9 +61,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'grocery_assistant.wsgi.application'
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -88,45 +95,22 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_FILTER_BACKENDS': [
             'django_filters.rest_framework.DjangoFilterBackend',
     ]
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.'
-    #                             'PageNumberPagination',
-    # 'PAGE_SIZE': 10,
 }
 
 AUTH_USER_MODEL = 'users.User'
 
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-# }
-
 DJOSER = {
-    # 'USER_ID_FIELD': '#/password/reset/confirm/{uid}/{token}',
-    # 'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    # 'SEND_ACTIVATION_EMAIL': True,
-    # 'SERIALIZERS': {
-    #     'user': 'api.serializers.UserSerializer',
-    # },
-    # 'USER_ID_FIELD': 'email',
     'LOGIN_FIELD': 'email'
 }
-
-# AUTHENTICATION_BACKENDS = (
-#     "django.contrib.auth.backends.ModelBackend",
-#     # "allauth.account.auth_backends.AuthenticationBackend"
-# )
-
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 LANGUAGE_CODE = 'en-us'
 
@@ -148,18 +132,36 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ROLES_PERMISSIONS = {
     'Users': {
-        'user': ('GET',),
-        'admin': ('GET',),
-        'anon': ('GET', 'POST'),
+        'user': ('GET', ),
+        'admin': ('GET', ),
+        'anon': ('GET', 'POST', ),
     },
     'Users_me': {
         'user': ('GET', ),
-        'moderator': ('GET', ),
+        'admin': ('GET', ),
         'anon': (None,),
     },
+    'Users_id': {
+        'user': ('GET', ),
+        'admin': ('GET', ),
+        'anon': ('GET', ),
+        },
     'Recipe': {
         'user': ('GET', 'POST', 'PUT', 'DELETE'),
-        'moderator': ('GET', 'PATCH', 'DELETE', 'POST', 'PUT'),
+        'admin': ('GET', 'POST', 'PUT', 'DELETE'),
         'anon': ('GET',),
+    },
+    'Shopping_cart': {
+        'user': ('GET', ),
+        'anon': (None,),
+    },
+    'Ingredients': {
+        'user': ('GET', ),
+        'anon': ('GET',),
+    },
+    'Tags': {
+        'admin': ('GET', 'POST', 'PUT', 'DELETE'),
+        'user': ('GET', ),
+        'anon': ('GET', ),
     },
 }

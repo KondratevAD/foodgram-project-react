@@ -57,17 +57,19 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
+    """Тэг рецепта"""
     name = models.CharField(
         'Тэг',
         max_length=200,
         help_text='Название тега',
         unique=True
     )
-    color = ColorField()
+    color = ColorField(unique=True)
     slug = models.SlugField(
         'slug',
         max_length=200,
-        unique=True
+        unique=True,
+        help_text='Slug тега'
     )
 
     def __str__(self) -> str:
@@ -80,6 +82,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    """Ингредиенты"""
     name = models.CharField(
         'Ингредиент',
         max_length=200,
@@ -101,10 +104,12 @@ class Ingredient(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Ингредиенты рецепта"""
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        verbose_name='Ингредиент рецепта'
+        verbose_name='Ингредиент рецепта',
+        help_text='Ингредиент рецепта'
     )
     amount = models.PositiveIntegerField(
         verbose_name='Количество',
@@ -121,6 +126,7 @@ class RecipeIngredient(models.Model):
 
 
 class Favorite(models.Model):
+    """Избранное"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -148,6 +154,7 @@ class Favorite(models.Model):
 
 
 class Follow(models.Model):
+    """Подписки"""
     user = models.ForeignKey(
         User,
         related_name='follower',

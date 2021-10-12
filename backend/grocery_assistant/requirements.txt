@@ -4,8 +4,17 @@ psycopg2
 flake8
 djoser
 djangorestframework
+#djangorestframework_simplejwt
 django-colorfield
 Pillow
 django-allauth
 reportlab
 django-filter
+django-cors-headers
+gunicorn
+psycopg2-binary
+sqlparse
+django-environ
+pytest-django
+pytest
+pytz
