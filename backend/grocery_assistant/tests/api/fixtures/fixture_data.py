@@ -45,3 +45,19 @@ def recipe(user, recipe_ingredient, tag):
     recipe.tags.add(tag)
     recipe.ingredients.add(recipe_ingredient)
     return recipe
+
+
+@pytest.fixture
+def another_recipe(another_user, recipe_ingredient, tag):
+    from recipes.models import Recipe
+    image = tempfile.NamedTemporaryFile(suffix='.jpg').name
+    recipe = Recipe.objects.create(
+        name='Тестовый рецепт 2',
+        text='Тестовое описание 2',
+        author=another_user,
+        image=image,
+        cooking_time=120
+    )
+    recipe.tags.add(tag)
+    recipe.ingredients.add(recipe_ingredient)
+    return recipe

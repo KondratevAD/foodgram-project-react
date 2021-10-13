@@ -20,6 +20,7 @@ last_name = 'User'
 name_recipe = 'Рецепт'
 text_recipe = 'Описание рецепта'
 cooking_time = 120
+image = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
 field_verboses_Recipe = {
     'name': 'Рецепт',
     'text': 'Описание рецепта',

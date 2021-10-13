@@ -4,6 +4,11 @@ services:
     image: postgres:12.4
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - PGUSER=${POSTGRES_USER}
+      - PGHOST=${DB_HOST}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGPORT=${DB_PORT}
     env_file:
       - ../backend/grocery_assistant/.env
   frontend:
@@ -15,13 +20,14 @@ services:
     depends_on:
       - db
   backend:
-    container_name: backend
+    container_name: foodgram
     build:
       context: ../backend/grocery_assistant/
       dockerfile: Dockerfile
-    image: backend:v1.0.0
-    ports:
-      - '8000:8000'
+    image: kondratevad/foodgram:v1.0.0
+    restart: always
+#    ports:
+#      - '8000:8000'
     volumes:
       - static_value:/code/static/
       - media_value:/code/media/
@@ -30,14 +36,14 @@ services:
     depends_on:
       - frontend
   migration:
-    image: backend:v1.0.0
+    image: kondratevad/foodgram:v1.0.0
     volumes:
       - ./code/
     command: bash -c "python manage.py makemigrations --noinput &&
              python manage.py migrate --noinput &&
-             python manage.py loaddata ingredients.json"
+             python manage.py loaddata data/data.json"
     depends_on:
-      - backend
+      - nginx
   nginx:
     image: nginx:1.19.3
     ports:
@@ -49,11 +55,9 @@ services:
       - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - static_value:/var/html/static/
       - media_value:/var/html/media/
-    restart: always
     depends_on:
-      - migration
+      - backend
 volumes:
   static_value:
   media_value:
   postgres_data:
-  result_build:

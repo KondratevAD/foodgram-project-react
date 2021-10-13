@@ -138,7 +138,88 @@ class TestUserAPI:
         test_data = response.json()
 
         assert test_data.get('username') == user.username, (
-            'Проверьте, что при GET запросе `//api/users/me/` возвращаете '
+            'Проверьте, что при GET запросе `/api/users/me/` возвращаете '
             'данные сериализатора, не найдено или не правильное значение'
             ' `username`'
+        )
+
+    @pytest.mark.django_db(transaction=True)
+    def test_user_follow(self, user_client, client, another_user):
+        response = user_client.get(const_url.user_follow_list)
+
+        assert response.status_code == 200, (
+                'Страница `/api/users/subscriptions/` не найдена, проверьте '
+                'этот адрес в *urls.py*'
+            )
+
+        response = client.get(const_url.user_follow_list)
+
+        assert response.status_code == 401, (
+            'Проверьте, что `/api/users/subscriptions/` доступен для чтения '
+            'только авторизованному пользователю'
+        )
+
+        response = user_client.get(f'/api/users/{another_user.id}/subscribe/')
+        assert response.status_code == 200, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращается статус 200'
+        )
+        follow_data = response.json()
+
+        assert follow_data.get('email') == another_user.email, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `email`'
+            )
+        assert follow_data.get('id') == another_user.id, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `id`'
+        )
+        assert follow_data.get('username') == another_user.username, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `username`'
+        )
+        assert follow_data.get('first_name') == another_user.first_name, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `first_name`'
+        )
+        assert follow_data.get('last_name') == another_user.last_name, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `last_name`'
+        )
+        assert 'is_subscribed' in follow_data, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `is_subscribed`'
+        )
+        assert 'recipes' in follow_data, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `recipes`'
+        )
+        assert 'recipes_count' in follow_data, (
+            'Проверьте, что при GET запросе `/api/users/{user.id}/subscribe/` '
+            'возвращаете данные сериализатора, не найдено или не правильное '
+            'значение `recipes_count`'
+        )
+        response = user_client.get(const_url.user_follow_list)
+        follow_list = response.json()
+        follow = follow_list.get('results')[0]
+        assert follow['username'] == another_user.username, (
+            'Проверьте что при подписке на автора он появился в листе подписок'
+        )
+
+        response = user_client.delete(f'/api/users/{another_user.id}/subscribe/')
+        assert response.status_code == 204, (
+            'Проверьте, что при DELETE запросе `/api/users/{user.id}/subscribe/'
+            ' возвращается статус 204'
+        )
+        response = user_client.get(const_url.user_follow_list)
+        follow_list = response.json()
+        assert follow_list.get('results') == [], (
+            'Проверьте что при отписке от автора он удаляется из листа подписок'
         )

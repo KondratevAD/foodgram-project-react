@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'DEFAULT')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '[*]')
 
 INSTALLED_APPS = [
     'colorfield',
@@ -61,10 +61,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'grocery_assistant.wsgi.application'
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
     'default': {
         'ENGINE': os.environ.get('DB_ENGINE'),
         'NAME': os.environ.get('DB_NAME'),
@@ -102,7 +98,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_FILTER_BACKENDS': [
-            'django_filters.rest_framework.DjangoFilterBackend',
+        'django_filters.rest_framework.DjangoFilterBackend',
     ]
 }
 
@@ -145,7 +141,7 @@ ROLES_PERMISSIONS = {
         'user': ('GET', ),
         'admin': ('GET', ),
         'anon': ('GET', ),
-        },
+    },
     'Recipe': {
         'user': ('GET', 'POST', 'PUT', 'DELETE'),
         'admin': ('GET', 'POST', 'PUT', 'DELETE'),
