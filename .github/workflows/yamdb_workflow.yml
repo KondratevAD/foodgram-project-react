@@ -21,6 +21,8 @@ jobs:
         pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
         # установка зависимостей
         pip install -r backend/grocery_assistant/requirements.txt
+        python backend/grocery_assistant/manage.py makemigrations
+        python backend/grocery_assistant/manage.py migrate
     - name: Test with flake8 and django tests
       run: |
         # запуск проверки проекта по flake8
