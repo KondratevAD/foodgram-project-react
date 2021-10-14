@@ -10,19 +10,19 @@ services:
       - PGPASSWORD=${POSTGRES_PASSWORD}
       - PGPORT=${DB_PORT}
     env_file:
-      - .env
+      - backend/grocery_assistant/.env
   frontend:
     build:
-      context: ../../frontend
-      dockerfile: ../../frontend/Dockerfile
+      context: frontend
+      dockerfile: frontend/Dockerfile
     volumes:
-      - ../frontend/:/app/result_build/
+      - frontend/:/app/result_build/
     depends_on:
       - db
   backend:
     container_name: foodgram
     build:
-      context: ""
+      context: backend/grocery_assistant/
       dockerfile: Dockerfile
     image: kondratevad/foodgram:v1.0.0
     restart: always
@@ -32,7 +32,7 @@ services:
       - static_value:/code/static/
       - media_value:/code/media/
     env_file:
-      - .env
+      - backend/grocery_assistant/.env
     depends_on:
       - frontend
   migration:
