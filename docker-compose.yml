@@ -10,7 +10,7 @@ services:
       - PGPASSWORD=${POSTGRES_PASSWORD}
       - PGPORT=${DB_PORT}
     env_file:
-      - ./backend/grocery_assistant/.env
+      - ./.env
   frontend:
     build:
       context: frontend
