@@ -21,9 +21,9 @@ services:
 #      - db
   backend:
     container_name: foodgram
-    build:
-      context: backend/grocery_assistant/
-      dockerfile: Dockerfile
+    build: .
+#      context: backend/grocery_assistant/
+#      dockerfile: Dockerfile
     image: kondratevad/foodgram:v1.0.0
     restart: always
 #    ports:
