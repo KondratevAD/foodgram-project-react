@@ -2,13 +2,13 @@ from functools import partial
 
 from django.shortcuts import get_object_or_404
 from grocery_assistant.settings import ROLES_PERMISSIONS
-from lib.filePDF import get_pdf
 from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from users.models import User
+from util.filePDF import get_pdf
 
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import StandardResultsSetPagination

@@ -1,11 +1,11 @@
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
-from lib.Image_base64 import Base64ImageField
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag)
 from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 from users.models import User
+from util.Image_base64 import Base64ImageField
 
 
 class UserSerializer(serializers.ModelSerializer):
