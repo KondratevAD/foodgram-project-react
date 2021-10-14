@@ -1,7 +1,7 @@
 import constants as const
 import constants_url as const_url
 import pytest
-from recipes.models import Recipe, Favorite
+from recipes.models import Favorite, Recipe
 
 
 class TestUserAPI:

@@ -1,5 +1,5 @@
-import constants_url as const_url
 import constants as const
+import constants_url as const_url
 import pytest
 from users.models import User
 

@@ -2,6 +2,7 @@ from functools import partial
 
 from django.shortcuts import get_object_or_404
 from grocery_assistant.settings import ROLES_PERMISSIONS
+from lib.filePDF import get_pdf
 from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
@@ -9,7 +10,6 @@ from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from users.models import User
 
-from .filePDF import get_pdf
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import StandardResultsSetPagination
 from .permissions import IsAuthor, PermissonForRole
@@ -126,6 +126,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ]
             for ingredient in ingredients:
                 if f'{ingredient.ingredient.id}' in data:
+
                     data[
                         f'{ingredient.ingredient.id}'
                     ]['amount'] += ingredient.amount

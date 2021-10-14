@@ -5,7 +5,7 @@ from users.models import User
 
 
 class Recipe(models.Model):
-    """Рецепт"""
+    """Рецепт."""
     name = models.CharField(
         'Рецепт',
         max_length=200,
@@ -39,7 +39,10 @@ class Recipe(models.Model):
     cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления',
         help_text='Время приготовления в минутах',
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(
+            1,
+            'Убедитесь, что это значение больше либо равно 1.'
+        )]
     )
     pub_date = models.DateTimeField(
         'Дата создания',
@@ -57,7 +60,7 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
-    """Тэг рецепта"""
+    """Тэг рецепта."""
     name = models.CharField(
         'Тэг',
         max_length=200,
@@ -67,7 +70,6 @@ class Tag(models.Model):
     color = ColorField(unique=True)
     slug = models.SlugField(
         'slug',
-        max_length=200,
         unique=True,
         help_text='Slug тега'
     )
@@ -82,7 +84,32 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Ингредиенты"""
+    """Ингредиенты."""
+    MEASURE_CHOICES = [
+        ('банка', 'Банка'),
+        ('батон', 'Батон'),
+        ('бутылка', 'Бутылка'),
+        ('веточка', 'Веточка'),
+        ('г', 'Грамм'),
+        ('горсть', 'Горсть'),
+        ('долька', 'Долька'),
+        ('звездочка', 'Звездочка'),
+        ('зубчик', 'Зубчик'),
+        ('капля', 'Капля'),
+        ('кг', 'Килограмм'),
+        ('кусок', 'Кусок'),
+        ('л', 'Литр'),
+        ('мл', 'Миллилитр'),
+        ('пакет', 'Пакет'),
+        ('по вкусу', 'По вкусу'),
+        ('пучок', 'Пучок'),
+        ('ст. л.', 'Столовая ложка'),
+        ('стакан', 'Стакан'),
+        ('упаковка', 'Упаковка'),
+        ('ч. л.', 'Чайная ложка'),
+        ('шт.', 'Штука'),
+        ('щепотка', 'Щепотка'),
+    ]
     name = models.CharField(
         'Ингредиент',
         max_length=200,
@@ -91,6 +118,7 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(
         'Единицы измерения',
         max_length=200,
+        choices=MEASURE_CHOICES,
         help_text='Единицы измерения ингредиента'
     )
 
@@ -104,7 +132,7 @@ class Ingredient(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    """Ингредиенты рецепта"""
+    """Ингредиенты рецепта."""
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -114,7 +142,10 @@ class RecipeIngredient(models.Model):
     amount = models.PositiveIntegerField(
         verbose_name='Количество',
         help_text='Количество ингредиента',
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(
+            1,
+            'Убедитесь, что это значение больше либо равно 1.'
+        )]
     )
 
     def __str__(self) -> str:
@@ -126,7 +157,7 @@ class RecipeIngredient(models.Model):
 
 
 class Favorite(models.Model):
-    """Избранное"""
+    """Избранное."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -154,7 +185,7 @@ class Favorite(models.Model):
 
 
 class Follow(models.Model):
-    """Подписки"""
+    """Подписки."""
     user = models.ForeignKey(
         User,
         related_name='follower',

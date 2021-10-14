@@ -4,7 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-    """Модель пользователя"""
+    """Модель пользователя."""
+
     class Roles(models.TextChoices):
         ADMIN = 'admin', _('Administrator')
         USER = 'user', _('User')

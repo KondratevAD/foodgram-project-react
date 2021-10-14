@@ -1,13 +1,11 @@
-
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
+from lib.Image_base64 import Base64ImageField
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag)
 from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 from users.models import User
-
-from .Image_base64 import Base64ImageField
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -125,7 +123,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             tag = get_object_or_404(Tag, id=tag_id)
             recipe.tags.add(tag)
         for ingredient in self.initial_data['ingredients']:
-            ingredient_mod = get_object_or_404(Ingredient, id=ingredient['id'])
+            ingredient_mod = Ingredient.objects.get(id=ingredient['id'])
             recipe_ingredient = RecipeIngredient.objects.create(
                 ingredient=ingredient_mod,
                 amount=ingredient['amount']
