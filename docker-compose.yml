@@ -10,20 +10,20 @@ services:
       - PGPASSWORD=${POSTGRES_PASSWORD}
       - PGPORT=${DB_PORT}
     env_file:
-      - ./.env
-#  frontend:
-#    build:
-#      context: frontend
-#      dockerfile: frontend/Dockerfile
-#    volumes:
-#      - frontend/:/app/result_build/
-#    depends_on:
-#      - db
+      - ./backend/grocery_assistant/.env
+  frontend:
+    build:
+      context: frontend
+      dockerfile: frontend/Dockerfile
+    volumes:
+      - frontend/:/app/result_build/
+    depends_on:
+      - db
   backend:
     container_name: foodgram
-    build: .
-#      context: backend/grocery_assistant/
-#      dockerfile: Dockerfile
+    build:
+      context: backend/grocery_assistant/
+      dockerfile: Dockerfile
     image: kondratevad/foodgram:v1.0.0
     restart: always
 #    ports:
@@ -32,13 +32,13 @@ services:
       - static_value:/code/static/
       - media_value:/code/media/
     env_file:
-      - ./.env
+      - ./backend/grocery_assistant/.env
     depends_on:
       - db
   migration:
     image: kondratevad/foodgram:v1.0.0
     volumes:
-      - ./code/
+      - ./code/backend/grocery_assistant/
     command: bash -c "python manage.py makemigrations --noinput &&
              python manage.py migrate --noinput &&
              python manage.py loaddata data/data.json"
@@ -50,7 +50,7 @@ services:
       - '80:80'
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-#      - ./frontend/build:/usr/share/nginx/html/
+      - ./frontend/build:/usr/share/nginx/html/
       - ./docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
       - ./docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - static_value:/var/html/static/
