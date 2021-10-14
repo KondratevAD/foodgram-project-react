@@ -14,8 +14,8 @@ services:
   frontend:
     image: kondratevad/foodgram:v1.0.0
     build:
-      context: .:/frontend/
-      dockerfile: frontend/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./code/frontend/:/app/result_build/
     depends_on:
@@ -23,17 +23,19 @@ services:
   backend:
     container_name: backend
     build:
-      context: backend/grocery_assistant/
+      context: .
       dockerfile: Dockerfile
     image: kondratevad/foodgram:v1.0.0
+
     restart: always
 #    ports:
 #      - '8000:8000'
     volumes:
       - static_value:/code/static/
       - media_value:/code/media/
+      - ./code/backend/grocery_assistant/
     env_file:
-      - ./code/backend/grocery_assistant/.env
+      - ./.env
     depends_on:
       - db
   migration:
