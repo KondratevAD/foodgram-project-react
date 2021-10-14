@@ -4,7 +4,7 @@ WORKDIR /code
 
 COPY . .
 
-WORKDIR /backend/grocery_assistant
+WORKDIR ./backend/grocery_assistant
 
 RUN pip3 install -r requirements.txt
 
