@@ -7,7 +7,7 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 
-class Base64ImageField(serializers.ImagField):
+class Base64ImageField(serializers.ImageField):
     """Поле ImageField обрабатывает изображение в кодировке base64."""
     def to_internal_value(self, data: str):
         """Декодирует изображение base64.
