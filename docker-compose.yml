@@ -13,9 +13,9 @@ services:
       - ./.env
   frontend:
     image: kondratevad/foodgram:v1.0.0
-#    build:
-#      context: .
-#      dockerfile: ./frontend/Dockerfile
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
     volumes:
       - .:/code/frontend/:/app/result_build/
     depends_on:
