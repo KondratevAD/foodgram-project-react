@@ -31,7 +31,7 @@ services:
       - static_value:/code/static/
       - media_value:/code/media/
     env_file:
-      - ./backend/grocery_assistant/.env
+      - ./.env
     depends_on:
       - db
   migration:
