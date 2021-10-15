@@ -46,7 +46,7 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - nginx
+      - backend
   nginx:
     image: nginx:1.19.3
     ports:
@@ -59,7 +59,7 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - backend
+      - migration
 volumes:
   static_value:
   media_value:
