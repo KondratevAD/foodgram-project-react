@@ -1,0 +1,66 @@
+version: '3.3'
+services:
+  db:
+    image: postgres:12.4
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - PGUSER=${POSTGRES_USER}
+      - PGHOST=${DB_HOST}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGPORT=${DB_PORT}
+    env_file:
+      - ./.env
+  frontend:
+    container_name: frontend
+    image: kondratevad/foodgram:v1.0.0
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    volumes:
+      - .:/code/frontend/
+    depends_on:
+      - db
+  backend:
+    container_name: backend
+    image: kondratevad/foodgram:v1.0.0
+    build:
+      context: .
+      dockerfile: ./backend/grocery_assistant/Dockerfile
+    restart: always
+    volumes:
+      - ./.env:/code/backend/grocery_assistant/.env
+      - static_value:/code/backend/grocery_assistant/static/
+      - media_value:/code/backend/grocery_assistant/media/
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+  migration:
+    image: kondratevad/foodgram:v1.0.0
+    volumes:
+      - .:/backend/grocery_assistant/
+    command: bash -c "python manage.py makemigrations --noinput &&
+             python manage.py migrate --noinput &&
+             python manage.py loaddata data/data.json"
+    env_file:
+      - ./.env
+    depends_on:
+      - backend
+  nginx:
+    image: nginx:1.19.3
+    ports:
+      - '80:80'
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./frontend/build:/usr/share/nginx/html/
+      - ./docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
+      - ./docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    depends_on:
+      - migration
+volumes:
+  static_value:
+  media_value:
+  postgres_data:
