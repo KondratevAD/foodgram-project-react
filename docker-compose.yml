@@ -10,7 +10,7 @@ services:
       - PGPASSWORD=${POSTGRES_PASSWORD}
       - PGPORT=${DB_PORT}
     env_file:
-      - ./code/.env
+      - ./.env
   frontend:
     image: kondratevad/foodgram:v1.0.0
     build:
@@ -33,7 +33,7 @@ services:
       - static_value:/code/static/
       - media_value:/code/media/
     env_file:
-      - ./code/.env
+      - ./.env
     depends_on:
       - frontend
   migration:

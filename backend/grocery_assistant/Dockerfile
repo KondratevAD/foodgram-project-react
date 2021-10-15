@@ -2,7 +2,9 @@ FROM python:3.8.5
 
 WORKDIR /code
 
-COPY ./backend/grocery_assistant .
+COPY . .
+
+WORKDIR ./backend/grocery_assistant
 
 RUN pip3 install -r requirements.txt
 
