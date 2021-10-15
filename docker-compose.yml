@@ -11,15 +11,15 @@ services:
       - PGPORT=${DB_PORT}
     env_file:
       - ./.env
-#  frontend:
-#    image: kondratevad/foodgram:v1.0.0
+  frontend:
+    image: kondratevad/foodgram:v1.0.0
 #    build:
 #      context: .
 #      dockerfile: ./frontend/Dockerfile
-#    volumes:
-#      - .:/code/frontend/:/app/result_build/
-#    depends_on:
-#      - db
+    volumes:
+      - .:/code/frontend/:/app/result_build/
+    depends_on:
+      - db
   backend:
     container_name: backend
     build:
