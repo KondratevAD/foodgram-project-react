@@ -22,8 +22,6 @@ jobs:
           # установка зависимостей
           pip install -r backend/grocery_assistant/requirements.txt
           python backend/grocery_assistant/manage.py makemigrations
-          python backend/grocery_assistant/manage.py migrate --noinput
-          python backend/grocery_assistant/manage.py loaddata backend/grocery_assistant/data/data.json
       - name: Test with flake8 and django tests
         run: |
           # запуск проверки проекта по flake8
