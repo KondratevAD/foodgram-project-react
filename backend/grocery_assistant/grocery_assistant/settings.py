@@ -1,10 +1,7 @@
 import os
 
 import dotenv
-import environ
 
-env = environ.Env()
-environ.Env.read_env()
 dotenv.load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -64,15 +61,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'grocery_assistant.wsgi.application'
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': os.environ.get('DB_ENGINE'),
-    #     'NAME': os.environ.get('DB_NAME'),
-    #     'USER': os.environ.get('POSTGRES_USER'),
-    #     'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-    #     'HOST': os.environ.get('DB_HOST'),
-    #     'PORT': os.environ.get('DB_PORT'),
-    # }
-    'default': env.db()
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
