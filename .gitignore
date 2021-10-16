@@ -12,7 +12,6 @@ media/
 
 static/
 migrations/
-build/
 develop-eggs/
 dist/
 downloads/
