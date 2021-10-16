@@ -26,17 +26,17 @@ services:
     env_file:
       - ./.env
 
-  migrations:
-    image: kondratevad/foodgram:v1.0.0
-    volumes:
-      - .:/backend/grocery_assistant/
-    command: bash -c "python manage.py makemigrations --noinput &&
-      python manage.py migrate --noinput &&
-      python manage.py loaddata data/data.json"
-    env_file:
-      - ./.env
-    depends_on:
-      - backend
+#  migrations:
+#    image: kondratevad/foodgram:v1.0.0
+#    volumes:
+#      - .:/backend/grocery_assistant/
+#    command: bash -c "python manage.py makemigrations --noinput &&
+#      python manage.py migrate --noinput &&
+#      python manage.py loaddata data/data.json"
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - backend
 
   nginx:
     image: nginx:1.19.3
@@ -51,7 +51,6 @@ services:
       - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
     restart: always
     depends_on:
-      - migrations
       - backend
       - frontend
 
