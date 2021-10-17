@@ -24,8 +24,8 @@ services:
     image: kondratevad/foodgram:v1.0.0
     restart: always
     volumes:
-      - static_value:/backend/grocery_assistant/static/
-      - media_value:/backend/grocery_assistant/media/
+      - static_value:/code/backend/grocery_assistant/static/
+      - media_value:/code/backend/grocery_assistant/media/
     env_file:
       - ./.env
     depends_on:
