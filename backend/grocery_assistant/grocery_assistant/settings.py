@@ -14,7 +14,6 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ['*'])
 
 INSTALLED_APPS = [
     'colorfield',
-    'users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -24,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'api',
+    'users',
     'recipes',
     'djoser',
     'django_filters',
