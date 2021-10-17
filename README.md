@@ -1,5 +1,5 @@
 ![example workflow](https://github.com/KondratevAD/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
-[![codecov](https://codecov.io/gh/KondratevAD/foodgram-project-react/branch/master/graph/badge.svg?token=VTYOU2MVMS)](https://codecov.io/gh/KondratevAD/foodgram-project-react)
+[![codecov backend](https://codecov.io/gh/KondratevAD/foodgram-project-react/branch/master/graph/badge.svg?token=VTYOU2MVMS)](https://codecov.io/gh/KondratevAD/foodgram-project-react)
 # Проект Foodgram-project-react
 
 ## Описание 
