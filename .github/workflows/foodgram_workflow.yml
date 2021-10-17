@@ -111,6 +111,8 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./backend/grocery_assistant/
+          files: ./coverage.xml
       - name: send message
         uses: appleboy/telegram-action@master
         with:
