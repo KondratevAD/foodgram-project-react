@@ -16,7 +16,7 @@ services:
   frontend:
     image: kondratevad/foodgram_frontend:v1.0.0
     volumes:
-      - result_build:/build
+      - ./frontend/:/app/result_build/
     depends_on:
       - db
 
