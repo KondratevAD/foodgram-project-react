@@ -1,14 +1,15 @@
 import django_filters
 from django_filters.rest_framework import filters
-from recipes.models import Ingredient, Recipe
+from recipes.models import Ingredient, Recipe, Tag
 from users.models import User
 
 
 class RecipeFilter(django_filters.FilterSet):
     author = filters.ModelChoiceFilter(queryset=User.objects.all())
-    tags = django_filters.CharFilter(
+    tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
-        lookup_expr='iexact'
+        to_field_name='slug',
+        queryset=Tag.objects.all()
     )
     is_favorited = filters.BooleanFilter(
         field_name='favorite__favorite',
