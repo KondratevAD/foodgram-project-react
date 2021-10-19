@@ -144,10 +144,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             except Exception:
                 recipe.delete()
-                # print(dir(e))
-                raise
-        # detail='В рецепте не может быть два одинаковых ингредиента'
-            # recipe.ingredients.add(recipe_ingredient)
+                if ingredient['amount'] <= 0:
+                    raise ParseError(
+                        detail='Количество ингредиента не может быть меньше 1.'
+                    )
+                raise ParseError(
+                    detail='В рецепте не может быть два '
+                           'одинаковых ингредиента.'
+                )
         return recipe
 
     def update(self, instance, validated_data):
@@ -175,9 +179,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                     ingredient=ingredient_mod,
                     amount=ingredient['amount']
                 )
-            except Exception as e:
-                raise ParseError(e
-                    # detail='Одинаковыве'
+            except Exception:
+                if ingredient['amount'] <= 0:
+                    raise ParseError(
+                        detail='Количество ингредиента не может быть меньше 1.'
+                    )
+                raise ParseError(
+                    detail='В рецепте не может быть два '
+                           'одинаковых ингредиента.'
                 )
         instance.save()
         return instance
