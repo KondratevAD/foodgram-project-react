@@ -44,7 +44,8 @@ class Recipe(models.Model):
         validators=[MinValueValidator(
             1,
             'Время приготовления должно быть больше либо равно 1.'
-        )]
+        )],
+
     )
     pub_date = models.DateTimeField(
         'Дата создания',
@@ -150,8 +151,8 @@ class RecipeIngredient(models.Model):
         verbose_name='Количество',
         help_text='Количество ингредиента',
         validators=[MinValueValidator(
-            1,
-            'Убедитесь, что это значение больше либо равно 1.'
+            limit_value=1,
+            message='Количество ингредиента не может быть меньше 1.'
         )]
     )
 

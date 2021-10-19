@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
+
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag)
 from rest_framework import serializers
@@ -94,6 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(
         max_length=None, use_url=True,
     )
+    cooking_time = serializers.IntegerField()
 
     class Meta:
         fields = (
@@ -109,6 +111,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
         model = Recipe
+
+    def validate_cooking_time(self, value):
+        print(value)
+        if int(value) < 1:
+            raise serializers.ValidationError(
+                "Время приготовления должно быть больше либо равно 1."
+            )
+        return value
 
     def create(self, validated_data):
         recipe = Recipe.objects.create(
@@ -136,6 +146,11 @@ class RecipeSerializer(serializers.ModelSerializer):
             #     raise ParseError(
             #         detail={'error': ['Одинаковыйе.']}
             #     )
+            if int(ingredient['amount']) < 1:
+                recipe.delete()
+                raise ParseError(
+                    detail='Количество ингредиента не может быть меньше 1.'
+                )
             try:
                 RecipeIngredient.objects.create(
                     recipe=recipe,
@@ -144,10 +159,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             except Exception:
                 recipe.delete()
-                if int(ingredient['amount']) < 1:
-                    raise ParseError(
-                        detail='Количество ингредиента не может быть меньше 1.'
-                    )
                 raise ParseError(
                     detail='В рецепте не может быть два '
                            'одинаковых ингредиента.'
@@ -173,6 +184,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         RecipeIngredient.objects.filter(recipe=instance).all().delete()
         for ingredient in self.initial_data['ingredients']:
             ingredient_mod = get_object_or_404(Ingredient, id=ingredient['id'])
+            if int(ingredient['amount']) < 1:
+                raise ParseError(
+                    detail='Количество ингредиента не может быть меньше 1.'
+                )
             try:
                 RecipeIngredient.objects.create(
                     recipe=instance,
@@ -180,10 +195,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                     amount=ingredient['amount']
                 )
             except Exception:
-                if int(ingredient['amount']) < 1:
-                    raise ParseError(
-                        detail='Количество ингредиента не может быть меньше 1.'
-                    )
                 raise ParseError(
                     detail='В рецепте не может быть два '
                            'одинаковых ингредиента.'
