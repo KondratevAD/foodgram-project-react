@@ -43,7 +43,7 @@ class Recipe(models.Model):
         help_text='Время приготовления в минутах',
         validators=[MinValueValidator(
             1,
-            'Убедитесь, что это значение больше либо равно 1.'
+            'Время приготовления должно быть больше либо равно 1.'
         )]
     )
     pub_date = models.DateTimeField(
