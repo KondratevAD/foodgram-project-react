@@ -37,7 +37,7 @@ services:
       - .:/backend/grocery_assistant/
     command: bash -c "python manage.py makemigrations --noinput &&
              python manage.py migrate --noinput &&
-             python manage.py loaddata data/data.json"
+             python manage.py loaddata data/data1.json"
     env_file:
       - ./.env
     depends_on:

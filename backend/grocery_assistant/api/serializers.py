@@ -145,7 +145,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             except Exception:
                 recipe.delete()
                 raise ParseError(
-                    detail='Одинаковыве'
+                    detail='В рецепте не может быть два одинаковых ингредиента'
                 )
 
             # recipe.ingredients.add(recipe_ingredient)
