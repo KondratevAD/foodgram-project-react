@@ -1,6 +1,7 @@
 import django_filters
 from django_filters.rest_framework import filters
 from recipes.models import Ingredient, Recipe, Tag
+from rest_framework.exceptions import ParseError
 from users.models import User
 
 
@@ -21,9 +22,22 @@ class RecipeFilter(django_filters.FilterSet):
     )
 
     def filter_favorite(self, queryset, name, value):
-        if value is False:
-            return queryset.exclude(**{name: True}).all()
-        return queryset.filter(**{name: True}).all()
+        if self.request.user.is_anonymous:
+            raise ParseError(
+                detail={
+                    'error': ['For this action, log in is required.']
+                }
+            )
+        if value is True:
+            return queryset.filter(
+                favorite__user=self.request.user,
+                **{name: True}
+            ).all()
+
+        return queryset.exclude(
+            favorite__user=self.request.user,
+            **{name: True}
+        ).all()
 
     class Meta:
         model = Recipe
