@@ -92,8 +92,8 @@ jobs:
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram:v1.0.0
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:v1.0.0
-            sudo docker-compose stop
-            sudo docker-compose rm backend
+            sudo docker rm -vf $(sudo docker ps -a -q)
+            sudo docker rmi $(sudo docker images -a -q) -f
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
