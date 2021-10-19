@@ -1,6 +1,5 @@
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
-
 from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag)
 from rest_framework import serializers
@@ -59,9 +58,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    # id = serializers.SerializerMethodField()
-    # name = serializers.SerializerMethodField()
-    # measurement_unit = serializers.SerializerMethodField()
     amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -73,14 +69,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         )
         model = Ingredient
         read_only_fields = ['id', 'name', 'measurement_unit']
-    # def get_id(self, obj):
-    #     return obj.id
-
-    # def get_name(self, obj):
-    #     return obj.name
-
-    # def get_measurement_unit(self, obj):
-    #     return obj.measurement_unit
 
     def get_amount(self, obj):
         return obj.recipeingredient.values('amount')[0].get('amount')
@@ -113,10 +101,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
 
     def validate_cooking_time(self, value):
-        print(value)
         if int(value) < 1:
             raise serializers.ValidationError(
-                "Время приготовления должно быть больше либо равно 1."
+                'Время приготовления должно быть больше либо равно 1.'
             )
         return value
 
@@ -134,18 +121,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise ParseError(
                     detail={'tags': ['A valid integer is required.']}
                 )
-            tag = get_object_or_404(Tag, id=tag_id)
+            try:
+                tag = Tag.objects.get(id=tag_id)
+            except Exception:
+                raise ParseError(detail='Тэг с таким id не существует.')
             recipe.tags.add(tag)
         for ingredient in self.initial_data['ingredients']:
             ingredient_mod = Ingredient.objects.get(id=ingredient['id'])
-            # if recipe.ingredients.select_related('ingredient').filter(
-            #         ingredient=ingredient_mod
-            # ).exists():
-            #     recipe.ingredients.all().delete()
-            #     recipe.delete()
-            #     raise ParseError(
-            #         detail={'error': ['Одинаковыйе.']}
-            #     )
             if int(ingredient['amount']) < 1:
                 recipe.delete()
                 raise ParseError(
@@ -178,7 +160,10 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise ParseError(
                     detail={'tags': ['A valid integer is required.']}
                 )
-            tag = get_object_or_404(Tag, id=tag_id)
+            try:
+                tag = Tag.objects.get(id=tag_id)
+            except Exception:
+                raise ParseError(detail='Тэг с таким id не существует.')
             instance.tags.clear()
             instance.tags.add(tag)
         RecipeIngredient.objects.filter(recipe=instance).all().delete()

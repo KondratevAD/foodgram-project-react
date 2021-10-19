@@ -23,16 +23,7 @@ def ingredient():
 
 
 @pytest.fixture
-def recipe_ingredient(ingredient):
-    from recipes.models import RecipeIngredient
-    return RecipeIngredient.objects.create(
-        ingredient=ingredient,
-        amount=120
-    )
-
-
-@pytest.fixture
-def recipe(user, recipe_ingredient, tag):
+def recipe(user, tag):
     from recipes.models import Recipe
     image = tempfile.NamedTemporaryFile(suffix='.jpg').name
     recipe = Recipe.objects.create(
@@ -43,12 +34,21 @@ def recipe(user, recipe_ingredient, tag):
         cooking_time=120
     )
     recipe.tags.add(tag)
-    recipe.ingredients.add(recipe_ingredient)
     return recipe
 
 
 @pytest.fixture
-def another_recipe(another_user, recipe_ingredient, tag):
+def recipe_ingredient(ingredient, recipe):
+    from recipes.models import RecipeIngredient
+    return RecipeIngredient.objects.create(
+        recipe=recipe,
+        ingredient=ingredient,
+        amount=120
+    )
+
+
+@pytest.fixture
+def another_recipe(another_user, tag):
     from recipes.models import Recipe
     image = tempfile.NamedTemporaryFile(suffix='.jpg').name
     recipe = Recipe.objects.create(
@@ -59,5 +59,14 @@ def another_recipe(another_user, recipe_ingredient, tag):
         cooking_time=120
     )
     recipe.tags.add(tag)
-    recipe.ingredients.add(recipe_ingredient)
     return recipe
+
+
+@pytest.fixture
+def another_recipe_ingredient(ingredient, another_recipe):
+    from recipes.models import RecipeIngredient
+    return RecipeIngredient.objects.create(
+        recipe=another_recipe,
+        ingredient=ingredient,
+        amount=120
+    )

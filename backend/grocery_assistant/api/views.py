@@ -2,7 +2,8 @@ from functools import partial
 
 from django.shortcuts import get_object_or_404
 from grocery_assistant.settings import ROLES_PERMISSIONS
-from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag, RecipeIngredient
+from recipes.models import (Favorite, Follow, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ParseError
@@ -124,18 +125,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ingredients = RecipeIngredient.objects.filter(
                 recipe=recipe
             ).all()
-
-
-        # if not recipes:
-        #     raise ParseError(
-        #         detail={
-        #             'error': ['Your shopping list is empty.']
-        #         }
-        #     )
-        # for recipe in recipes:
-        #     ingredients = [
-        #         ingredients for ingredients in recipe.ingredients.all()
-        #     ]
             for ingredient in ingredients:
                 if f'{ingredient.ingredient.id}' in data:
 
@@ -155,14 +144,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     )
         data = dict(sorted(data.items(), key=lambda item: item[1]['name']))
         return get_pdf(data)
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED,
-    #                     headers=headers)
 
     def perform_create(self, serializer):
         if 'tags' not in self.request.data:
