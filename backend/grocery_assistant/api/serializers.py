@@ -58,9 +58,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
-    measurement_unit = serializers.SerializerMethodField()
+    # id = serializers.SerializerMethodField()
+    # name = serializers.SerializerMethodField()
+    # measurement_unit = serializers.SerializerMethodField()
+    amount = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
@@ -69,16 +70,19 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             'measurement_unit',
             'amount'
         )
-        model = RecipeIngredient
+        model = Ingredient
+        read_only_fields = ['id', 'name', 'measurement_unit']
+    # def get_id(self, obj):
+    #     return obj.id
 
-    def get_id(self, obj):
-        return obj.ingredient.id
+    # def get_name(self, obj):
+    #     return obj.name
 
-    def get_name(self, obj):
-        return obj.ingredient.name
+    # def get_measurement_unit(self, obj):
+    #     return obj.measurement_unit
 
-    def get_measurement_unit(self, obj):
-        return obj.ingredient.measurement_unit
+    def get_amount(self, obj):
+        return obj.recipeingredient.values('amount')[0].get('amount')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -124,19 +128,27 @@ class RecipeSerializer(serializers.ModelSerializer):
             recipe.tags.add(tag)
         for ingredient in self.initial_data['ingredients']:
             ingredient_mod = Ingredient.objects.get(id=ingredient['id'])
-            if recipe.ingredients.select_related('ingredient').filter(
-                    ingredient=ingredient_mod
-            ).exists():
-                recipe.ingredients.all().delete()
+            # if recipe.ingredients.select_related('ingredient').filter(
+            #         ingredient=ingredient_mod
+            # ).exists():
+            #     recipe.ingredients.all().delete()
+            #     recipe.delete()
+            #     raise ParseError(
+            #         detail={'error': ['Одинаковыйе.']}
+            #     )
+            try:
+                RecipeIngredient.objects.create(
+                    recipe=recipe,
+                    ingredient=ingredient_mod,
+                    amount=ingredient['amount']
+                )
+            except Exception:
                 recipe.delete()
                 raise ParseError(
-                    detail={'error': ['Одинаковыйе.']}
+                    detail='Одинаковыве'
                 )
-            recipe_ingredient = RecipeIngredient.objects.create(
-                ingredient=ingredient_mod,
-                amount=ingredient['amount']
-            )
-            recipe.ingredients.add(recipe_ingredient)
+
+            # recipe.ingredients.add(recipe_ingredient)
         return recipe
 
     def update(self, instance, validated_data):
@@ -155,14 +167,19 @@ class RecipeSerializer(serializers.ModelSerializer):
             tag = get_object_or_404(Tag, id=tag_id)
             instance.tags.clear()
             instance.tags.add(tag)
-        instance.ingredients.all().delete()
+        RecipeIngredient.objects.filter(recipe=instance).all().delete()
         for ingredient in self.initial_data['ingredients']:
             ingredient_mod = get_object_or_404(Ingredient, id=ingredient['id'])
-            recipe_ingredient = RecipeIngredient.objects.create(
-                ingredient=ingredient_mod,
-                amount=ingredient['amount']
-            )
-            instance.ingredients.add(recipe_ingredient)
+            try:
+                RecipeIngredient.objects.create(
+                    recipe=instance,
+                    ingredient=ingredient_mod,
+                    amount=ingredient['amount']
+                )
+            except Exception:
+                raise ParseError(
+                    detail='Одинаковыве'
+                )
         instance.save()
         return instance
 

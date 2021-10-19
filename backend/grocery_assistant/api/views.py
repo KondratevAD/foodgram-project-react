@@ -170,7 +170,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(tags=tag_id)
 
     def perform_destroy(self, instance):
-        instance.ingredients.all().delete()
         instance.delete()
 
 

@@ -94,6 +94,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
     """Админка ингредиентов рецепта"""
     list_display = (
         'pk',
+        'recipe',
         'ingredient',
         'amount'
     )

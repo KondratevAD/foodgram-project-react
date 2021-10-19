@@ -27,7 +27,9 @@ class Recipe(models.Model):
         help_text='Изображение'
     )
     ingredients = models.ManyToManyField(
-        'RecipeIngredient',
+        'Ingredient',
+        through='RecipeIngredient',
+        # through_fields=('ingredient', 'recipe'),
         verbose_name='Ингредиенты',
         help_text='Ингредиенты',
     )
@@ -133,8 +135,13 @@ class Ingredient(models.Model):
 
 class RecipeIngredient(models.Model):
     """Ингредиенты рецепта."""
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE
+    )
     ingredient = models.ForeignKey(
         Ingredient,
+        related_name='recipeingredient',
         on_delete=models.CASCADE,
         verbose_name='Ингредиент рецепта',
         help_text='Ингредиент рецепта'
@@ -154,6 +161,7 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент рецепта'
         verbose_name_plural = 'Ингредиенты рецепта'
+        unique_together = [['recipe', 'ingredient']]
 
 
 class Favorite(models.Model):
