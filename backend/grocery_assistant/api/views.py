@@ -2,7 +2,7 @@ from functools import partial
 
 from django.shortcuts import get_object_or_404
 from grocery_assistant.settings import ROLES_PERMISSIONS
-from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag
+from recipes.models import Favorite, Follow, Ingredient, Recipe, Tag, RecipeIngredient
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ParseError
@@ -113,8 +113,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipes = Recipe.objects.filter(
             favorite__user=self.request.user,
             favorite__shopping_cart=True
-        ).prefetch_related('ingredients')
-        print(recipes)
+        ).all()
         if not recipes:
             raise ParseError(
                 detail={
@@ -122,22 +121,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 }
             )
         for recipe in recipes:
-            ingredients = [
-                ingredients for ingredients in recipe.ingredients.all()
-            ]
+            ingredients = RecipeIngredient.objects.filter(
+                recipe=recipe
+            ).all()
+
+
+        # if not recipes:
+        #     raise ParseError(
+        #         detail={
+        #             'error': ['Your shopping list is empty.']
+        #         }
+        #     )
+        # for recipe in recipes:
+        #     ingredients = [
+        #         ingredients for ingredients in recipe.ingredients.all()
+        #     ]
             for ingredient in ingredients:
-                if f'{ingredient.id}' in data:
+                if f'{ingredient.ingredient.id}' in data:
 
                     data[
-                        f'{ingredient.id}'
+                        f'{ingredient.ingredient.id}'
                     ]['amount'] += ingredient.amount
                 else:
                     data.update(
                         {
-                            f'{ingredient.id}': {
-                                'name': ingredient.name,
+                            f'{ingredient.ingredient.id}': {
+                                'name': ingredient.ingredient.name,
                                 'measurement_unit':
-                                    ingredient.measurement_unit,
+                                    ingredient.ingredient.measurement_unit,
                                 'amount': ingredient.amount
                             }
                         }
@@ -154,7 +165,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     #                     headers=headers)
 
     def perform_create(self, serializer):
-        print(repr(serializer))
         if 'tags' not in self.request.data:
             raise ParseError(detail={'tags': ['This field is required.']})
         tag_id = self.request.data['tags']
