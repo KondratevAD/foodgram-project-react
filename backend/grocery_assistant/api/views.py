@@ -144,6 +144,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         data = dict(sorted(data.items(), key=lambda item: item[1]['name']))
         return get_pdf(data)
 
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED,
+    #                     headers=headers)
+
     def perform_create(self, serializer):
         if 'tags' not in self.request.data:
             raise ParseError(detail={'tags': ['This field is required.']})
