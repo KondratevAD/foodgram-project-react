@@ -15,18 +15,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # обновление pip
           python -m pip install --upgrade pip
-          # установка flake8 и его плагинов
           pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
-          # установка зависимостей
           pip install -r backend/grocery_assistant/requirements.txt
           python backend/grocery_assistant/manage.py makemigrations
       - name: Test with flake8
         run: |
           # запуск проверки проекта по flake8
           python -m flake8
-          python -m pytest backend/grocery_assistant/tests
       - name: Generate coverage report
         run: |
           pip install pytest
