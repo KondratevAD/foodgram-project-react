@@ -35,7 +35,8 @@ services:
     image: kondratevad/foodgram:v1.0.0
     volumes:
       - .:/backend/grocery_assistant/
-    command: bash -c "python manage.py makemigrations --noinput &&
+    command: bash -c "python manage.py makemigrations users --noinput &&
+             python manage.py makemigrations recipes --noinput &&
              python manage.py migrate --noinput &&
              python manage.py loaddata data/data.json"
     env_file:
