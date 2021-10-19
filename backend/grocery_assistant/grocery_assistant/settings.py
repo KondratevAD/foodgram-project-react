@@ -62,17 +62,13 @@ WSGI_APPLICATION = 'grocery_assistant.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
-    # 'default': {
-    #     'ENGINE': os.environ.get('DB_ENGINE'),
-    #     'NAME': os.environ.get('DB_NAME'),
-    #     'USER': os.environ.get('POSTGRES_USER'),
-    #     'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-    #     'HOST': os.environ.get('DB_HOST'),
-    #     'PORT': os.environ.get('DB_PORT'),
-    # }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -147,8 +143,8 @@ ROLES_PERMISSIONS = {
         'anon': ('GET', ),
     },
     'Recipe': {
-        'user': ('GET', 'POST', 'PUT', 'DELETE'),
-        'admin': ('GET', 'POST', 'PUT', 'DELETE'),
+        'user': ('GET', 'POST', 'PATH', 'PUT', 'DELETE'),
+        'admin': ('GET', 'POST', 'PATH', 'PUT', 'DELETE'),
         'anon': ('GET',),
     },
     'Shopping_cart': {
@@ -156,6 +152,7 @@ ROLES_PERMISSIONS = {
         'anon': (None,),
     },
     'Ingredients': {
+        'admin': ('GET', 'POST', 'PUT', 'DELETE'),
         'user': ('GET', ),
         'anon': ('GET',),
     },
