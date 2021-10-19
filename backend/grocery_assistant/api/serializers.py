@@ -4,7 +4,6 @@ from recipes.models import (Favorite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag)
 from rest_framework import serializers
 from rest_framework.exceptions import ParseError
-from rest_framework.validators import UniqueTogetherValidator
 from users.models import User
 from util.Image_base64 import Base64ImageField
 
@@ -106,13 +105,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
         model = Recipe
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Ingredient.objects.all(),
-                fields=['id'],
-                message='Вы уже добавили этот ингредиент'
-            )
-        ]
 
     def create(self, validated_data):
         recipe = Recipe.objects.create(
@@ -132,6 +124,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             recipe.tags.add(tag)
         for ingredient in self.initial_data['ingredients']:
             ingredient_mod = Ingredient.objects.get(id=ingredient['id'])
+            if recipe.ingredients.select_related('ingredient').filter(
+                    ingredient=ingredient_mod
+            ).exists():
+                recipe.ingredients.all().delete()
+                recipe.delete()
+                raise ParseError(
+                    detail={'error': ['Одинаковыйе.']}
+                )
             recipe_ingredient = RecipeIngredient.objects.create(
                 ingredient=ingredient_mod,
                 amount=ingredient['amount']

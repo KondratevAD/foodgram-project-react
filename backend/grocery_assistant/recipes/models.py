@@ -29,7 +29,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         'RecipeIngredient',
         verbose_name='Ингредиенты',
-        help_text='Ингредиенты'
+        help_text='Ингредиенты',
     )
     tags = models.ManyToManyField(
         'Tag',
