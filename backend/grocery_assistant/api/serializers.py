@@ -144,7 +144,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             except Exception:
                 recipe.delete()
-                if ingredient['amount'] <= 0:
+                if int(ingredient['amount']) <= 0:
                     raise ParseError(
                         detail='Количество ингредиента не может быть меньше 1.'
                     )
@@ -180,7 +180,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     amount=ingredient['amount']
                 )
             except Exception:
-                if ingredient['amount'] <= 0:
+                if int(ingredient['amount']) <= 0:
                     raise ParseError(
                         detail='Количество ингредиента не может быть меньше 1.'
                     )
